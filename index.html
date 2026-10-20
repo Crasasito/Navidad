@@ -476,7 +476,44 @@
   </style>
 </head>
 <body>
+  <!-- ================= BLOQUEO CON CONTRASEÑA DE ACCESO ================= -->
+  <div id="pantalla-bloqueo" style="position:fixed; inset:0; background:#0f4c81; z-index:99999; display:flex; align-items:center; justify-content:center; padding:20px;">
+    <form onsubmit="verificarAccesoWeb(event)" style="background:#ffffff; max-width:420px; width:100%; padding:28px 24px; border-radius:12px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.3); text-align:center;">
+      <div style="font-size:2.5rem; margin-bottom:10px;">🔒</div>
+      <h2 style="color:#0f4c81; font-size:1.3rem; margin-bottom:8px;">Acceso al Servicio</h2>
+      <p style="color:#64748b; font-size:0.9rem; margin-bottom:20px;">Introduce la contraseña para ver y registrar las vacaciones de Navidad.</p>
+      <input type="password" id="clave-acceso-web" placeholder="Contraseña de acceso" required style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:8px; font-size:1rem; margin-bottom:12px;">
+      <p id="error-acceso-web" style="color:#b91c1c; font-size:0.85rem; font-weight:600; margin-bottom:12px; display:none;">❌ Contraseña incorrecta</p>
+      <button type="submit" style="width:100%; background:#0f4c81; color:#ffffff; border:none; padding:13px; font-size:1rem; font-weight:700; border-radius:8px; cursor:pointer;">Entrar</button>
+    </form>
+  </div>
+  <script>
+    (function() {
+      const CLAVE_CORRECTA = "2026EstonopasabaconVicente2027";
+      const STORAGE_ACCESO = "acceso_navidad_autorizado_v1";
 
+      if (sessionStorage.getItem(STORAGE_ACCESO) === "si") {
+        document.getElementById("pantalla-bloqueo").style.display = "none";
+      } else {
+        document.body.style.overflow = "hidden";
+      }
+
+      window.verificarAccesoWeb = function(e) {
+        e.preventDefault();
+        const input = document.getElementById("clave-acceso-web").value.trim();
+        if (input === CLAVE_CORRECTA) {
+          sessionStorage.setItem(STORAGE_ACCESO, "si");
+          document.getElementById("pantalla-bloqueo").style.display = "none";
+          document.body.style.overflow = "";
+        } else {
+          document.getElementById("error-acceso-web").style.display = "block";
+          document.getElementById("clave-acceso-web").value = "";
+        }
+      };
+    })();
+  </script>
+  <!-- =============== FIN BLOQUEO CON CONTRASEÑA DE ACCESO =============== -->
+  
   <!-- =====================================================================
        ZONA DE CONFIGURACIÓN RÁPIDA (PARA EL CREADOR DEL ARCHIVO)
        ===================================================================== -->
