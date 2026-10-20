@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elección de Vacaciones y Guardias de Navidad</title>
+  <style>
+    :root {
+      --primary: #0f4c81;
+      --primary-light: #e8f1f8;
+      --success: #15803d;
+      --success-bg: #dcfce7;
+      --success-border: #86efac;
+      --warning: #b45309;
+      --warning-bg: #fef3c7;
+      --warning-border: #fde68a;
+      --danger: #b91c1c;
+      --danger-bg: #fee2e2;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --border: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 20px 15px 50px;
+    }
+
+    .container {
+      max-width: 940px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 15px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      font-size: 1.45rem;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-admin {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .btn-admin:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .alert-banner {
+      background: var(--warning-bg);
+      border-left: 5px solid var(--warning);
+      color: #78350f;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+    }
+
+    .alert-banner strong {
+      display: block;
+      font-size: 1.05rem;
+      margin-bottom: 4px;
+    }
+
+    .sync-error-banner {
+      display: none;
+      background: var(--danger-bg);
+      border-left: 5px solid var(--danger);
+      color: #7f1d1d;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      color: var(--primary);
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--primary-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label.field-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="password"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      background: #fff;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15, 76, 129, 0.15);
+    }
+
+    .weeks-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 640px) {
+      .weeks-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .week-option {
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      background: #fafafa;
+    }
+
+    .week-option:hover {
+      border-color: var(--primary);
+      background: #fff;
+    }
+
+    .week-option.selected {
+      border-color: var(--success);
+      background: var(--success-bg);
+      box-shadow: 0 4px 12px rgba(21, 128, 61, 0.12);
+    }
+
+    .week-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+    }
+
+    .week-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--primary-light);
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .week-option.selected .week-badge {
+      background: var(--success);
+      color: white;
+    }
+
+    .week-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .week-dates {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    .week-note {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .implication-box {
+      display: none;
+      margin-top: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .implication-row {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95rem;
+    }
+
+    .implication-vacation {
+      background: var(--success-bg);
+      color: #14532d;
+      border-bottom: 1px solid var(--success-border);
+    }
+
+    .implication-guardia {
+      background: var(--warning-bg);
+      color: #78350f;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.2s;
+    }
+
+    .btn-submit:hover {
+      background: #09355c;
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Estadísticas de 5 bloques */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background: var(--bg);
+      padding: 14px 10px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    .stat-box.highlight-missing {
+      background: var(--warning-bg);
+      border-color: var(--warning-border);
+    }
+
+    .stat-box.highlight-complete {
+      background: var(--success-bg);
+      border-color: var(--success-border);
+    }
+
+    .stat-number {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .stat-box.highlight-missing .stat-number {
+      color: var(--warning);
+    }
+
+    .stat-box.highlight-complete .stat-number {
+      color: var(--success);
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--bg);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.03em;
+    }
+
+    tr:hover td {
+      background: #f8fafc;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .status-done {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .status-pending {
+      background: var(--warning-bg);
+      color: var(--warning);
+      border: 1px solid var(--warning-border);
+    }
+
+    .week-tag-1 {
+      color: #0369a1;
+      font-weight: 700;
+    }
+
+    .week-tag-2 {
+      color: #6d28d9;
+      font-weight: 700;
+    }
+
+    .timestamp {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+    }
+
+    .modal {
+      background: white;
+      max-width: 620px;
+      width: 100%;
+      border-radius: 12px;
+      padding: 24px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .help-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .toast {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1e293b;
+      color: white;
+      padding: 14px 20px;
+      border-radius: 8px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+      z-index: 200;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =====================================================================
+       ZONA DE CONFIGURACIÓN RÁPIDA (PARA EL CREADOR DEL ARCHIVO)
+       ===================================================================== -->
+  <script>
+    const CONFIG_INICIAL = {
+      // Nombre del Servicio o Unidad
+      nombreServicio: "Medicina Interna Morales Meseguer - Navidad 2026/2027",
+
+      // Fechas de la Primera y Segunda Semana
+      semana1Titulo: "1ª Semana (Nochebuena / Navidad)",
+      semana1Fechas: "Del 23 de diciembre al 29 de diciembre",
+
+      semana2Titulo: "2ª Semana (Nochevieja / Año Nuevo / Reyes)",
+      semana2Fechas: "Del 30 de diciembre al 6 de enero",
+
+      // Número TOTAL de adjuntos que hacen guardias (para calcular cuántos faltan por elegir).
+      // Puedes cambiar este número aquí o desde el Modo Administrador en la web.
+      totalAdjuntosGuardias: 15,
+
+      // Lista opcional de nombres de Adjuntos (en MAYÚSCULAS).
+      // - Si pones todos los nombres aquí (o en Modo Admin), saldrá un desplegable cerrado.
+      // - Si lo dejas vacío [], cada adjunto escribe su nombre y se pasa a MAYÚSCULAS automáticamente,
+      //   usando 'totalAdjuntosGuardias' para calcular cuántos faltan por elegir.
+      listaAdjuntos: [
+        // Puedes añadir el resto de nombres aquí o desde el botón "Modo Administrador":
+        // "ANTONIO SÁNCHEZ",
+      ],
+
+      // PIN para entrar al botón "Modo Administrador" desde la web
+      pinAdmin: "401106",
+
+      // URL de Firebase Realtime Database (sin barra final ni :null)
+      urlNubeFirebase: "https://vacaciones-navidad-default-rtdb.firebaseio.com"
+    };
+  </script>
+  <!-- ==================== FIN DE ZONA DE CONFIGURACIÓN ==================== -->
+
+  <div class="container">
+    <header>
+      <div>
+        <h1 id="ui-servicio-titulo">Elección de Vacaciones de Navidad</h1>
+        <p>Registro oficial de turnos de descanso y disponibilidad de guardias</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-admin" onclick="forzarRefrescoManual()">🔄 Actualizar datos</button>
+        <button class="btn-admin" onclick="abrirModalAdmin()">⚙ Modo Administrador</button>
+      </div>
+    </header>
+
+    <!-- Banner de diagnóstico si Firebase falla por reglas o URL -->
+    <div class="sync-error-banner" id="banner-error-firebase">
+      <strong>🔴 Error de sincronización con Firebase:</strong>
+      <span id="texto-error-firebase"></span>
+    </div>
+
+    <div class="alert-banner">
+      <strong>⚠️ IMPORTANTE: ¿Qué estás eligiendo en este formulario?</strong>
+      Debes seleccionar la <u>semana que quieres disfrutar de VACACIONES (libre de guardias)</u>. 
+      Por tanto, la semana que <strong>NO</strong> elijas será aquella en la que <strong>SÍ estarás disponible para hacer guardias</strong>.
+      Si necesitas cambiar tu elección más adelante, vuelve a introducir tu nombre y se actualizará tu última elección y la fecha.
+    </div>
+
+    <!-- FORMULARIO DE ELECCIÓN -->
+    <div class="card">
+      <div class="card-title">
+        <span>1. Registrar o Modificar mi Elección</span>
+        <span id="indicador-modo" style="font-size: 0.82rem; font-weight: 600;">⏳ Conectando...</span>
+      </div>
+
+      <form id="form-eleccion" onsubmit="guardarEleccion(event)">
+        <div class="form-group">
+          <label class="field-label" for="input-nombre">Nombre y Apellido del Adjunto/a:</label>
+          <div id="contenedor-input-nombre"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="field-label">Selecciona tu SEMANA DE VACACIONES (semana en la que NO harás guardias):</label>
+          <div class="weeks-grid">
+            <label class="week-option" id="card-semana-1" onclick="seleccionarSemana('1')">
+              <input type="radio" name="semana" value="1" required>
+              <span class="week-badge">Opción 1</span>
+              <div class="week-name" id="ui-sem1-titulo">1ª Semana</div>
+              <div class="week-dates" id="ui-sem1-fechas">Fechas 1ª Semana</div>
+              <div class="week-note">Elegir esta semana como <strong>VACACIONES (Sin Guardias)</strong></div>
+            </label>
+
+            <label class="week-option" id="card-semana-2" onclick="seleccionarSemana('2')">
+              <input type="radio" name="semana" value="2" required>
+              <span class="week-badge">Opción 2</span>
+              <div class="week-name" id="ui-sem2-titulo">2ª Semana</div>
+              <div class="week-dates" id="ui-sem2-fechas">Fechas 2ª Semana</div>
+              <div class="week-note">Elegir esta semana como <strong>VACACIONES (Sin Guardias)</strong></div>
+            </label>
+          </div>
+        </div>
+
+        <div class="implication-box" id="cuadro-implicacion">
+          <div class="implication-row implication-vacation">
+            <span>🏖️</span>
+            <div>
+              <strong>VACACIONES (SIN GUARDIAS):</strong>
+              <span id="resumen-vacaciones">-</span>
+            </div>
+          </div>
+          <div class="implication-row implication-guardia">
+            <span>🏥</span>
+            <div>
+              <strong>DISPONIBLE PARA GUARDIAS:</strong>
+              <span id="resumen-guardias">-</span>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="btn-guardar">Confirmar y Guardar mi Elección</button>
+      </form>
+    </div>
+
+    <!-- TABLA VISIBLE PARA TODOS -->
+    <div class="card">
+      <div class="card-title">
+        <span>2. Estado de Elecciones del Servicio</span>
+        <div class="toolbar">
+          <button type="button" class="btn-secondary" onclick="forzarRefrescoManual()">🔄 Refrescar</button>
+          <button type="button" class="btn-secondary" onclick="copiarResumenWhatsApp()">📋 Copiar para WhatsApp</button>
+          <button type="button" class="btn-secondary" onclick="exportarCSV()">📥 Excel (CSV)</button>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-number" id="stat-total-servicio">0</div>
+          <div class="stat-label">Total Adjuntos Guardias</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number" id="stat-elegidos">0</div>
+          <div class="stat-label">Han elegido ya</div>
+        </div>
+        <div class="stat-box highlight-missing" id="box-faltan">
+          <div class="stat-number" id="stat-faltan">0</div>
+          <div class="stat-label" id="label-faltan">Faltan por elegir</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number" id="stat-sem1">0</div>
+          <div class="stat-label">Vacaciones 1ª Sem</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number" id="stat-sem2">0</div>
+          <div class="stat-label">Vacaciones 2ª Sem</div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Adjunto/a</th>
+              <th>¿Ha elegido?</th>
+              <th>Vacaciones (SIN Guardias)</th>
+              <th>Disponible para GUARDIAS</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-resultados"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE ADMINISTRADOR -->
+  <div class="modal-overlay" id="modal-admin">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>⚙ Configuración del Administrador</h3>
+        <button class="btn-secondary" onclick="cerrarModalAdmin()">✕ Cerrar</button>
+      </div>
+
+      <div id="admin-login-view">
+        <div class="form-group">
+          <label class="field-label">Introduce el PIN de Administrador:</label>
+          <input type="password" id="input-pin" placeholder="Introduce tu PIN">
+        </div>
+        <button class="btn-submit" onclick="verificarPin()">Acceder al Panel</button>
+      </div>
+
+      <div id="admin-panel-view" style="display: none;">
+        <div class="form-group">
+          <label class="field-label">Título del Servicio:</label>
+          <input type="text" id="admin-servicio">
+        </div>
+
+        <div class="form-group">
+          <label class="field-label">Número TOTAL de adjuntos que hacen guardias:</label>
+          <input type="number" id="admin-total-adjuntos" min="1" max="200" placeholder="Ej: 16">
+          <p class="help-text">Sirve para calcular cuántos adjuntos faltan por elegir (si rellenas la lista de nombres debajo, se ajustará automáticamente al número de nombres si es mayor).</p>
+        </div>
+
+        <div class="form-group">
+          <label class="field-label">1ª Semana - Nombre y Fechas:</label>
+          <input type="text" id="admin-sem1-titulo" style="margin-bottom: 6px;">
+          <input type="text" id="admin-sem1-fechas">
+        </div>
+
+        <div class="form-group">
+          <label class="field-label">2ª Semana - Nombre y Fechas:</label>
+          <input type="text" id="admin-sem2-titulo" style="margin-bottom: 6px;">
+          <input type="text" id="admin-sem2-fechas">
+        </div>
+
+        <div class="form-group">
+          <label class="field-label">Lista de Nombres de Adjuntos (Opcional, uno por línea):</label>
+          <textarea id="admin-lista-adjuntos" rows="6" placeholder="ANTONIO SÁNCHEZ&#10;MARÍA GÓMEZ&#10;JUAN PÉREZ"></textarea>
+          <p class="help-text">Si pones los nombres aquí, saldrá un desplegable cerrado con estos nombres y aparecerán en la tabla como "Pendiente" hasta que voten. Si lo dejas vacío, cada adjunto escribirá su nombre libremente.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="field-label">URL Sincronización en la Nube (Firebase):</label>
+          <input type="text" id="admin-firebase-url" placeholder="https://vacaciones-navidad-default-rtdb.firebaseio.com">
+        </div>
+
+        <button class="btn-submit" onclick="guardarConfigAdmin()">Guardar Cambios en la Nube</button>
+
+        <hr style="margin: 24px 0; border: none; border-top: 1px solid var(--border);">
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.85rem; color: var(--danger); font-weight: 600;">Zona peligrosa:</span>
+          <button type="button" class="btn-secondary" style="color: var(--danger); border-color: var(--danger);" onclick="borrarTodasLasElecciones()">🗑️ Borrar todas las elecciones</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast-msg"></div>
+
+  <script>
+    const STORAGE_CONFIG_KEY = "navidad_servicio_config_v2";
+    const STORAGE_DATA_KEY = "navidad_servicio_elecciones_v2";
+
+    let configActual = {};
+    let eleccionesActuales = {};
+    let semanaSeleccionadaTemp = null;
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      cargarConfiguracionLocal();
+      aplicarConfiguracionUI();
+      await cargarDatosDesdeNube(false);
+      renderizarTabla();
+
+      // Refresco automático cada 10 segundos para sincronizar móviles y web
+      setInterval(async () => {
+        if (obtenerUrlFirebase()) {
+          await cargarDatosDesdeNube(true);
+          renderizarTabla();
+        }
+      }, 10000);
+    });
+
+    function normalizarClave(nombre) {
+      return String(nombre || "")
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, " ");
+    }
+
+    function obtenerUrlFirebase() {
+      const url = (configActual.urlNubeFirebase || CONFIG_INICIAL.urlNubeFirebase || "").trim();
+      return url.replace(/\/:null$/i, "").replace(/\/$/, "");
+    }
+
+    function cargarConfiguracionLocal() {
+      const guardada = localStorage.getItem(STORAGE_CONFIG_KEY);
+      if (guardada) {
+        try {
+          const parsed = JSON.parse(guardada);
+          configActual = { ...CONFIG_INICIAL, ...parsed };
+          // Nunca permitir que un valor vacío antiguo en localStorage borre la URL de Firebase del código
+          if (!configActual.urlNubeFirebase && CONFIG_INICIAL.urlNubeFirebase) {
+            configActual.urlNubeFirebase = CONFIG_INICIAL.urlNubeFirebase;
+          }
+        } catch (e) {
+          configActual = { ...CONFIG_INICIAL };
+        }
+      } else {
+        configActual = { ...CONFIG_INICIAL };
+      }
+    }
+
+    function actualizarEstadoConexionUI(ok, mensajeError = "") {
+      const indicador = document.getElementById("indicador-modo");
+      const bannerError = document.getElementById("banner-error-firebase");
+      const textoError = document.getElementById("texto-error-firebase");
+
+      if (!obtenerUrlFirebase()) {
+        indicador.textContent = "💻 Modo local (sin nube)";
+        indicador.style.color = "var(--text-muted)";
+        bannerError.style.display = "none";
+        return;
+      }
+
+      if (ok) {
+        indicador.textContent = "🟢 Conectado en tiempo real (Nube activa)";
+        indicador.style.color = "var(--success)";
+        bannerError.style.display = "none";
+      } else {
+        indicador.textContent = "🔴 Error de conexión con Firebase";
+        indicador.style.color = "var(--danger)";
+        bannerError.style.display = "block";
+        textoError.textContent = mensajeError;
+      }
+    }
+
+    // Lee los datos frescos desde Firebase evitando la caché del móvil
+    async function cargarDatosDesdeNube(silencioso = false) {
+      const urlNube = obtenerUrlFirebase();
+      if (urlNube) {
+        try {
+          const resp = await fetch(`${urlNube}/navidad_data.json?t=${Date.now()}`, {
+            method: "GET",
+            cache: "no-store"
+          });
+
+          if (resp.ok) {
+            const data = await resp.json();
+            if (data) {
+              if (data.config) {
+                const urlFija = obtenerUrlFirebase();
+                configActual = { ...CONFIG_INICIAL, ...data.config, urlNubeFirebase: urlFija };
+                localStorage.setItem(STORAGE_CONFIG_KEY, JSON.stringify(configActual));
+                aplicarConfiguracionUI();
+              }
+              eleccionesActuales = data.elecciones || {};
+              localStorage.setItem(STORAGE_DATA_KEY, JSON.stringify(eleccionesActuales));
+            } else {
+              eleccionesActuales = {};
+            }
+            actualizarEstadoConexionUI(true);
+            return true;
+          } else {
+            let motivo = `Código HTTP ${resp.status}. `;
+            if (resp.status === 401 || resp.status === 403) {
+              motivo += "Las Reglas (Rules) de tu Firebase están bloqueadas. Entra en console.firebase.google.com -> Realtime Database -> pestaña 'Reglas' y cambia '.read' y '.write' a true.";
+            } else if (resp.status === 404) {
+              motivo += "La dirección URL de Firebase no existe o es de otra región (revisa si acaba en .firebasedatabase.app).";
+            }
+            actualizarEstadoConexionUI(false, motivo);
+          }
+        } catch (err) {
+          actualizarEstadoConexionUI(
+            false,
+            "No se pudo conectar con la URL de Firebase. Revisa que tu base de datos esté creada en Realtime Database y que la URL sea exacta."
+          );
+        }
+      }
+
+      // Respaldo local si falla la red
+      const local = localStorage.getItem(STORAGE_DATA_KEY);
+      if (local) {
+        try {
+          eleccionesActuales = JSON.parse(local);
+        } catch (e) {
+          eleccionesActuales = {};
+        }
+      }
+      return false;
+    }
+
+    // Guarda únicamente la elección del adjunto actual para no pisar a otros compañeros
+    async function guardarEleccionEnNube(clave, datosAdjunto) {
+      localStorage.setItem(STORAGE_DATA_KEY, JSON.stringify(eleccionesActuales));
+      const urlNube = obtenerUrlFirebase();
+      if (!urlNube) return true;
+
+      try {
+        const resp = await fetch(`${urlNube}/navidad_data/elecciones/${encodeURIComponent(clave)}.json`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(datosAdjunto),
+          cache: "no-store"
+        });
+
+        if (!resp.ok) {
+          actualizarEstadoConexionUI(
+            false,
+            `Firebase rechazó el guardado (Error ${resp.status}). Revisa la pestaña 'Reglas' en Firebase y asegúrate de que .read y .write estén en true.`
+          );
+          alert(`⚠️ ATENCIÓN: Tu elección NO se ha podido guardar en la nube (Error ${resp.status} de Firebase). Revisa el aviso rojo superior.`);
+          return false;
+        }
+
+        actualizarEstadoConexionUI(true);
+        return true;
+      } catch (e) {
+        actualizarEstadoConexionUI(false, "Error de red al intentar guardar en Firebase.");
+        alert("⚠️ Error de conexión al guardar en la nube. Comprueba tu conexión a internet o la URL de Firebase.");
+        return false;
+      }
+    }
+
+    // Guarda la configuración del Administrador en la nube
+    async function guardarConfigEnNube() {
+      localStorage.setItem(STORAGE_CONFIG_KEY, JSON.stringify(configActual));
+      const urlNube = obtenerUrlFirebase();
+      if (!urlNube) return true;
+
+      try {
+        const resp = await fetch(`${urlNube}/navidad_data/config.json`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(configActual),
+          cache: "no-store"
+        });
+        if (!resp.ok) {
+          alert(`Error al guardar configuración en Firebase (Código ${resp.status}).`);
+          return false;
+        }
+        actualizarEstadoConexionUI(true);
+        return true;
+      } catch (e) {
+        alert("No se pudo conectar con Firebase para guardar la configuración.");
+        return false;
+      }
+    }
+
+    async function forzarRefrescoManual() {
+      mostrarToast("🔄 Sincronizando con la nube...");
+      await cargarDatosDesdeNube(false);
+      renderizarTabla();
+      mostrarToast("✅ Datos actualizados");
+    }
+
+    function aplicarConfiguracionUI() {
+      document.getElementById("ui-servicio-titulo").textContent = configActual.nombreServicio;
+      document.getElementById("ui-sem1-titulo").textContent = configActual.semana1Titulo;
+      document.getElementById("ui-sem1-fechas").textContent = configActual.semana1Fechas;
+      document.getElementById("ui-sem2-titulo").textContent = configActual.semana2Titulo;
+      document.getElementById("ui-sem2-fechas").textContent = configActual.semana2Fechas;
+
+      const contenedorNombre = document.getElementById("contenedor-input-nombre");
+      const valorPrevio = document.getElementById("input-nombre") ? document.getElementById("input-nombre").value : "";
+
+      if (Array.isArray(configActual.listaAdjuntos) && configActual.listaAdjuntos.length > 0) {
+        let opcionesHTML = `<option value="">-- Selecciona tu nombre en la lista --</option>`;
+        configActual.listaAdjuntos.forEach(adj => {
+          const nombreMayus = adj.toUpperCase();
+          const sel = nombreMayus === valorPrevio ? "selected" : "";
+          opcionesHTML += `<option value="${escaparHTML(nombreMayus)}" ${sel}>${escaparHTML(nombreMayus)}</option>`;
+        });
+        contenedorNombre.innerHTML = `<select id="input-nombre" required>${opcionesHTML}</select>`;
+      } else {
+        contenedorNombre.innerHTML = `<input type="text" id="input-nombre" required placeholder="Ej: ANTONIO SÁNCHEZ" style="text-transform: uppercase;" value="${escaparHTML(valorPrevio)}">`;
+      }
+
+      if (semanaSeleccionadaTemp) {
+        actualizarCuadroImplicacion(semanaSeleccionadaTemp);
+      }
+    }
+
+    function seleccionarSemana(numSemana) {
+      semanaSeleccionadaTemp = numSemana;
+      document.getElementById("card-semana-1").classList.toggle("selected", numSemana === "1");
+      document.getElementById("card-semana-2").classList.toggle("selected", numSemana === "2");
+
+      const radios = document.getElementsByName("semana");
+      radios.forEach(r => { r.checked = (r.value === numSemana); });
+
+      actualizarCuadroImplicacion(numSemana);
+    }
+
+    function actualizarCuadroImplicacion(numSemana) {
+      const cuadro = document.getElementById("cuadro-implicacion");
+      const spanVac = document.getElementById("resumen-vacaciones");
+      const spanGua = document.getElementById("resumen-guardias");
+
+      cuadro.style.display = "block";
+      if (numSemana === "1") {
+        spanVac.textContent = `${configActual.semana1Titulo} (${configActual.semana1Fechas})`;
+        spanGua.textContent = `${configActual.semana2Titulo} (${configActual.semana2Fechas})`;
+      } else {
+        spanVac.textContent = `${configActual.semana2Titulo} (${configActual.semana2Fechas})`;
+        spanGua.textContent = `${configActual.semana1Titulo} (${configActual.semana1Fechas})`;
+      }
+    }
+
+    async function guardarEleccion(e) {
+      e.preventDefault();
+      const inputNombre = document.getElementById("input-nombre");
+      // Convertimos siempre a MAYÚSCULAS como "ANTONIO SÁNCHEZ"
+      const nombreLimpio = inputNombre.value.trim().toUpperCase();
+
+      if (!nombreLimpio) {
+        alert("Por favor, indica tu nombre.");
+        return;
+      }
+      if (!semanaSeleccionadaTemp) {
+        alert("Por favor, selecciona qué semana deseas de vacaciones.");
+        return;
+      }
+
+      const btn = document.getElementById("btn-guardar");
+      btn.disabled = true;
+      btn.textContent = "Guardando en la nube...";
+
+      const clave = normalizarClave(nombreLimpio);
+      const yaExistia = Boolean(eleccionesActuales[clave]);
+
+      const ahora = new Date();
+      const fechaFormateada = ahora.toLocaleDateString("es-ES", {
+        day: "2-digit", month: "2-digit", year: "numeric"
+      }) + " a las " + ahora.toLocaleTimeString("es-ES", {
+        hour: "2-digit", minute: "2-digit"
+      });
+
+      const registro = {
+        nombreMostrar: nombreLimpio,
+        semanaVacaciones: semanaSeleccionadaTemp,
+        ultimaFecha: fechaFormateada,
+        timestampMs: ahora.getTime()
+      };
+
+      eleccionesActuales[clave] = registro;
+
+      const exitoNube = await guardarEleccionEnNube(clave, registro);
+      await cargarDatosDesdeNube(true);
+      renderizarTabla();
+
+      btn.disabled = false;
+      btn.textContent = "Confirmar y Guardar mi Elección";
+
+      if (exitoNube) {
+        mostrarToast(
+          yaExistia
+            ? `✅ Actualizada la elección de ${nombreLimpio}`
+            : `✅ Elección guardada para ${nombreLimpio}`
+        );
+
+        document.getElementById("form-eleccion").reset();
+        document.getElementById("card-semana-1").classList.remove("selected");
+        document.getElementById("card-semana-2").classList.remove("selected");
+        document.getElementById("cuadro-implicacion").style.display = "none";
+        semanaSeleccionadaTemp = null;
+      }
+    }
+
+    function renderizarTabla() {
+      const tbody = document.getElementById("tabla-resultados");
+      tbody.innerHTML = "";
+
+      let filas = [];
+      const listaCerrada = Array.isArray(configActual.listaAdjuntos) && configActual.listaAdjuntos.length > 0;
+
+      if (listaCerrada) {
+        const clavesMostradas = new Set();
+        configActual.listaAdjuntos.forEach(nombreOficial => {
+          const nombreMayus = nombreOficial.trim().toUpperCase();
+          const clave = normalizarClave(nombreMayus);
+          clavesMostradas.add(clave);
+          const datos = eleccionesActuales[clave] || null;
+          filas.push({
+            nombre: nombreMayus,
+            haElegido: Boolean(datos),
+            semanaVacaciones: datos ? datos.semanaVacaciones : null,
+            ultimaFecha: datos ? datos.ultimaFecha : null
+          });
+        });
+
+        Object.keys(eleccionesActuales).forEach(clave => {
+          if (!clavesMostradas.has(clave)) {
+            const d = eleccionesActuales[clave];
+            filas.push({
+              nombre: (d.nombreMostrar || "").toUpperCase(),
+              haElegido: true,
+              semanaVacaciones: d.semanaVacaciones,
+              ultimaFecha: d.ultimaFecha
+            });
+          }
+        });
+      } else {
+        filas = Object.values(eleccionesActuales)
+          .sort((a, b) => (a.nombreMostrar || "").localeCompare(b.nombreMostrar || "", "es"))
+          .map(d => ({
+            nombre: (d.nombreMostrar || "").toUpperCase(),
+            haElegido: true,
+            semanaVacaciones: d.semanaVacaciones,
+            ultimaFecha: d.ultimaFecha
+          }));
+      }
+
+      let contElegidos = 0;
+      let contSem1 = 0;
+      let contSem2 = 0;
+
+      if (filas.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">
+              Todavía ningún adjunto ha registrado su semana de vacaciones.
+            </td>
+          </tr>`;
+      } else {
+        filas.forEach(f => {
+          if (f.haElegido) {
+            contElegidos++;
+            if (f.semanaVacaciones === "1") contSem1++;
+            if (f.semanaVacaciones === "2") contSem2++;
+          }
+
+          const textoVacaciones = !f.haElegido
+            ? "-"
+            : f.semanaVacaciones === "1"
+              ? `<span class="week-tag-1">1ª Semana</span><br><small>${escaparHTML(configActual.semana1Fechas)}</small>`
+              : `<span class="week-tag-2">2ª Semana</span><br><small>${escaparHTML(configActual.semana2Fechas)}</small>`;
+
+          const textoGuardias = !f.haElegido
+            ? "-"
+            : f.semanaVacaciones === "1"
+              ? `<strong>2ª Semana</strong><br><small>${escaparHTML(configActual.semana2Fechas)}</small>`
+              : `<strong>1ª Semana</strong><br><small>${escaparHTML(configActual.semana1Fechas)}</small>`;
+
+          const estadoHTML = f.haElegido
+            ? `<span class="status-pill status-done">✓ Ha elegido</span>
+               <span class="timestamp">Última elección: ${escaparHTML(f.ultimaFecha)}</span>`
+            : `<span class="status-pill status-pending">⏳ Pendiente de elegir</span>`;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><strong>${escaparHTML(f.nombre)}</strong></td>
+            <td>${estadoHTML}</td>
+            <td>${textoVacaciones}</td>
+            <td>${textoGuardias}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Cálculo del total de adjuntos y cuántos faltan por elegir
+      const numConfigurado = parseInt(configActual.totalAdjuntosGuardias, 10) || 0;
+      const totalServicio = Math.max(numConfigurado, listaCerrada ? configActual.listaAdjuntos.length : 0, contElegidos);
+      const faltanPorElegir = Math.max(0, totalServicio - contElegidos);
+
+      document.getElementById("stat-total-servicio").textContent = totalServicio;
+      document.getElementById("stat-elegidos").textContent = `${contElegidos} / ${totalServicio}`;
+      document.getElementById("stat-faltan").textContent = faltanPorElegir;
+      document.getElementById("stat-sem1").textContent = contSem1;
+      document.getElementById("stat-sem2").textContent = contSem2;
+
+      const boxFaltan = document.getElementById("box-faltan");
+      const labelFaltan = document.getElementById("label-faltan");
+      if (totalServicio > 0 && faltanPorElegir === 0) {
+        boxFaltan.classList.remove("highlight-missing");
+        boxFaltan.classList.add("highlight-complete");
+        labelFaltan.textContent = "¡Todos han elegido!";
+      } else {
+        boxFaltan.classList.add("highlight-missing");
+        boxFaltan.classList.remove("highlight-complete");
+        labelFaltan.textContent = "Faltan por elegir";
+      }
+    }
+
+    function abrirModalAdmin() {
+      document.getElementById("modal-admin").style.display = "flex";
+      document.getElementById("admin-login-view").style.display = "block";
+      document.getElementById("admin-panel-view").style.display = "none";
+      document.getElementById("input-pin").value = "";
+    }
+
+    function cerrarModalAdmin() {
+      document.getElementById("modal-admin").style.display = "none";
+    }
+
+    function verificarPin() {
+      const pinIntroducido = document.getElementById("input-pin").value.trim();
+      if (pinIntroducido === String(configActual.pinAdmin)) {
+        document.getElementById("admin-login-view").style.display = "none";
+        document.getElementById("admin-panel-view").style.display = "block";
+
+        document.getElementById("admin-servicio").value = configActual.nombreServicio || "";
+        document.getElementById("admin-total-adjuntos").value = configActual.totalAdjuntosGuardias || 15;
+        document.getElementById("admin-sem1-titulo").value = configActual.semana1Titulo || "";
+        document.getElementById("admin-sem1-fechas").value = configActual.semana1Fechas || "";
+        document.getElementById("admin-sem2-titulo").value = configActual.semana2Titulo || "";
+        document.getElementById("admin-sem2-fechas").value = configActual.semana2Fechas || "";
+        document.getElementById("admin-lista-adjuntos").value = (configActual.listaAdjuntos || []).join("\n");
+        document.getElementById("admin-firebase-url").value = obtenerUrlFirebase();
+      } else {
+        alert("PIN incorrecto.");
+      }
+    }
+
+    async function guardarConfigAdmin() {
+      configActual.nombreServicio = document.getElementById("admin-servicio").value.trim() || CONFIG_INICIAL.nombreServicio;
+      configActual.totalAdjuntosGuardias = parseInt(document.getElementById("admin-total-adjuntos").value, 10) || 0;
+      configActual.semana1Titulo = document.getElementById("admin-sem1-titulo").value.trim() || CONFIG_INICIAL.semana1Titulo;
+      configActual.semana1Fechas = document.getElementById("admin-sem1-fechas").value.trim() || CONFIG_INICIAL.semana1Fechas;
+      configActual.semana2Titulo = document.getElementById("admin-sem2-titulo").value.trim() || CONFIG_INICIAL.semana2Titulo;
+      configActual.semana2Fechas = document.getElementById("admin-sem2-fechas").value.trim() || CONFIG_INICIAL.semana2Fechas;
+
+      const textoAdjuntos = document.getElementById("admin-lista-adjuntos").value;
+      configActual.listaAdjuntos = textoAdjuntos
+        .split("\n")
+        .map(s => s.trim().toUpperCase())
+        .filter(Boolean);
+
+      if (configActual.listaAdjuntos.length > configActual.totalAdjuntosGuardias) {
+        configActual.totalAdjuntosGuardias = configActual.listaAdjuntos.length;
+      }
+
+      configActual.urlNubeFirebase = document.getElementById("admin-firebase-url").value
+        .trim()
+        .replace(/\/:null$/i, "")
+        .replace(/\/$/, "");
+
+      await guardarConfigEnNube();
+      aplicarConfiguracionUI();
+      renderizarTabla();
+      cerrarModalAdmin();
+      mostrarToast("⚙ Configuración guardada y sincronizada en la nube");
+    }
+
+    async function borrarTodasLasElecciones() {
+      if (confirm("¿Estás seguro de que quieres BORRAR todas las elecciones registradas hasta ahora? Esta acción las borrará de la nube para todos.")) {
+        eleccionesActuales = {};
+        localStorage.setItem(STORAGE_DATA_KEY, JSON.stringify({}));
+        const urlNube = obtenerUrlFirebase();
+        if (urlNube) {
+          await fetch(`${urlNube}/navidad_data/elecciones.json`, { method: "DELETE" });
+        }
+        renderizarTabla();
+        cerrarModalAdmin();
+        mostrarToast("🗑️ Se han borrado todos los registros");
+      }
+    }
+
+    function copiarResumenWhatsApp() {
+      const lista = Object.values(eleccionesActuales);
+      const numConfigurado = parseInt(configActual.totalAdjuntosGuardias, 10) || 0;
+      const totalServicio = Math.max(numConfigurado, (configActual.listaAdjuntos || []).length, lista.length);
+      const faltan = Math.max(0, totalServicio - lista.length);
+
+      const sem1 = lista.filter(d => d.semanaVacaciones === "1");
+      const sem2 = lista.filter(d => d.semanaVacaciones === "2");
+
+      let texto = `*🎄 ${configActual.nombreServicio}*\n`;
+      texto += `📊 *Han elegido:* ${lista.length} de ${totalServicio} adjuntos _(Faltan ${faltan} por elegir)_\n\n`;
+
+      texto += `*🏖️ VACACIONES 1ª SEMANA (${configActual.semana1Fechas})* [${sem1.length}]\n_(Disponibles para guardias en la 2ª semana)_\n`;
+      texto += sem1.length ? sem1.map(d => `• ${d.nombreMostrar} _(${d.ultimaFecha})_`).join("\n") : "• _Nadie por ahora_";
+
+      texto += `\n\n*🏖️ VACACIONES 2ª SEMANA (${configActual.semana2Fechas})* [${sem2.length}]\n_(Disponibles para guardias en la 1ª semana)_\n`;
+      texto += sem2.length ? sem2.map(d => `• ${d.nombreMostrar} _(${d.ultimaFecha})_`).join("\n") : "• _Nadie por ahora_";
+
+      navigator.clipboard.writeText(texto).then(() => {
+        mostrarToast("📋 Resumen copiado para WhatsApp");
+      });
+    }
+
+    function exportarCSV() {
+      const lista = Object.values(eleccionesActuales);
+      if (lista.length === 0) {
+        alert("No hay datos registrados para exportar.");
+        return;
+      }
+
+      let csv = "\uFEFFAdjunto;Ha Elegido;Semana Vacaciones (Sin Guardias);Fechas Vacaciones;Semana Disponible Guardias;Ultima Modificacion\n";
+      lista.forEach(d => {
+        const vacTitulo = d.semanaVacaciones === "1" ? configActual.semana1Titulo : configActual.semana2Titulo;
+        const vacFechas = d.semanaVacaciones === "1" ? configActual.semana1Fechas : configActual.semana2Fechas;
+        const guaTitulo = d.semanaVacaciones === "1" ? configActual.semana2Titulo : configActual.semana1Titulo;
+        csv += `"${d.nombreMostrar}";"Sí";"${vacTitulo}";"${vacFechas}";"${guaTitulo}";"${d.ultimaFecha}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "vacaciones_y_guardias_navidad.csv";
+      a.click();
+    }
+
+    function mostrarToast(mensaje) {
+      const t = document.getElementById("toast-msg");
+      t.textContent = mensaje;
+      t.style.display = "block";
+      setTimeout(() => { t.style.display = "none"; }, 3500);
+    }
+
+    function escaparHTML(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
